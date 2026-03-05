@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Portfolio de Automatizaciones</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0D0F14;
+    --surface: #161920;
+    --surface2: #1E2230;
+    --border: #2A2F40;
+    --accent: #4DFFC3;
+    --accent2: #7B6EF6;
+    --text: #E8ECF5;
+    --muted: #6B7491;
+    --tag-bg: #1A2035;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: .4;
+  }
+
+  /* ── GLOW BLOBS ── */
+  .blob {
+    position: fixed; border-radius: 50%; filter: blur(120px);
+    pointer-events: none; z-index: 0;
+  }
+  .blob-1 { width: 500px; height: 500px; background: rgba(77,255,195,.07); top: -100px; right: -100px; }
+  .blob-2 { width: 400px; height: 400px; background: rgba(123,110,246,.06); bottom: 100px; left: -80px; }
+
+  /* ── LAYOUT ── */
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* ── HEADER ── */
+  header { padding: 72px 0 56px; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(77,255,195,.08); border: 1px solid rgba(77,255,195,.2);
+    color: var(--accent); font-size: 12px; font-weight: 500; letter-spacing: .08em;
+    text-transform: uppercase; padding: 6px 14px; border-radius: 100px;
+    margin-bottom: 28px;
+  }
+  .badge span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .4; transform: scale(.8); }
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 6vw, 58px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    margin-bottom: 20px;
+  }
+
+  h1 .accent { color: var(--accent); }
+  h1 .accent2 { color: var(--accent2); }
+
+  .subtitle {
+    font-size: 17px; color: var(--muted); line-height: 1.65;
+    max-width: 520px; font-weight: 300;
+  }
+
+  /* ── STATS BAR ── */
+  .stats {
+    display: flex; gap: 0;
+    border: 1px solid var(--border); border-radius: 16px;
+    overflow: hidden; margin: 48px 0;
+    background: var(--surface);
+  }
+  .stat {
+    flex: 1; padding: 20px 24px; border-right: 1px solid var(--border);
+    transition: background .2s;
+  }
+  .stat:last-child { border-right: none; }
+  .stat:hover { background: var(--surface2); }
+  .stat-num {
+    font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700;
+    color: var(--accent); line-height: 1;
+  }
+  .stat-num.v2 { color: var(--accent2); }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 6px; font-weight: 400; }
+
+  /* ── FILTERS ── */
+  .filters {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; align-items: center;
+  }
+  .filter-label { font-size: 12px; color: var(--muted); margin-right: 4px; letter-spacing: .05em; text-transform: uppercase; }
+
+  .filter-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--muted); font-size: 13px; font-family: 'DM Sans', sans-serif;
+    padding: 7px 16px; border-radius: 100px; cursor: pointer;
+    transition: all .2s; font-weight: 400;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: rgba(77,255,195,.1); border-color: rgba(77,255,195,.3);
+    color: var(--accent);
+  }
+
+  /* ── PROJECT GRID ── */
+  .grid { display: flex; flex-direction: column; gap: 16px; margin-bottom: 80px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 32px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: start;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .25s, transform .2s, box-shadow .25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--accent);
+    transform: scaleY(0); transform-origin: bottom;
+    transition: transform .3s ease;
+    border-radius: 0 2px 2px 0;
+  }
+
+  .card:hover {
+    border-color: rgba(77,255,195,.25);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0,0,0,.35);
+  }
+
+  .card:hover::before { transform: scaleY(1); }
+
+  .card.rpa::before     { background: #4DFFC3; }
+  .card.script::before  { background: #7B6EF6; }
+  .card.etl::before     { background: #F6A96E; }
+  .card.integracion::before { background: #6EB5F6; }
+
+  .card-left { display: flex; flex-direction: column; gap: 12px; }
+
+  .card-meta {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+
+  .card-type {
+    font-size: 11px; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 6px;
+  }
+  .type-rpa          { background: rgba(77,255,195,.1);  color: #4DFFC3; }
+  .type-script       { background: rgba(123,110,246,.1); color: #7B6EF6; }
+  .type-etl          { background: rgba(246,169,110,.1); color: #F6A96E; }
+  .type-integracion  { background: rgba(110,181,246,.1); color: #6EB5F6; }
+
+  .card-date { font-size: 12px; color: var(--muted); }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px; font-weight: 700;
+    line-height: 1.3; letter-spacing: -.01em;
+  }
+
+  .card-desc {
+    font-size: 14px; color: var(--muted); line-height: 1.6; font-weight: 300;
+    max-width: 560px;
+  }
+
+  .card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+
+  .tag {
+    font-size: 11px; background: var(--tag-bg); color: var(--muted);
+    padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border);
+    font-weight: 400;
+  }
+
+  /* ── METRICS PILLS ── */
+  .card-right { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+
+  .metric {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 14px; text-align: right; min-width: 110px;
+  }
+  .metric-val {
+    font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700;
+    color: var(--accent); line-height: 1;
+  }
+  .metric-val.v2 { color: var(--accent2); }
+  .metric-label { font-size: 10px; color: var(--muted); margin-top: 3px; font-weight: 400; }
+
+  .arrow {
+    width: 32px; height: 32px; background: rgba(77,255,195,.08);
+    border: 1px solid rgba(77,255,195,.2); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent); font-size: 16px; transition: all .2s;
+    margin-top: 8px;
+  }
+  .card:hover .arrow {
+    background: rgba(77,255,195,.15);
+    transform: translateX(3px);
+  }
+
+  /* ── EMPTY STATE (para proyectos nuevos) ── */
+  .card-placeholder {
+    background: transparent;
+    border: 2px dashed var(--border);
+    border-radius: 20px; padding: 36px;
+    text-align: center; color: var(--muted);
+  }
+  .card-placeholder .ph-icon { font-size: 28px; margin-bottom: 10px; opacity: .4; }
+  .card-placeholder .ph-text { font-size: 14px; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 0; text-align: center;
+    color: var(--muted); font-size: 13px;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .card { grid-template-columns: 1fr; }
+    .card-right { flex-direction: row; align-items: center; flex-wrap: wrap; }
+    .stats { flex-direction: column; }
+    .stat { border-right: none; border-bottom: 1px solid var(--border); }
+    .stat:last-child { border-bottom: none; }
+    .arrow { display: none; }
+  }
+
+  /* ── ENTRANCE ANIMATION ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .card { animation: fadeUp .4s ease both; }
+  .card:nth-child(1) { animation-delay: .05s; }
+  .card:nth-child(2) { animation-delay: .12s; }
+  .card:nth-child(3) { animation-delay: .19s; }
+  .card:nth-child(4) { animation-delay: .26s; }
+  .card:nth-child(5) { animation-delay: .33s; }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="badge"><span></span> Portfolio en construcción</div>
+    <h1>Proyectos de<br><span class="accent">Automatización</span> &<br><span class="accent2">Mejora Continua</span></h1>
+    <p class="subtitle">Documentación técnica de soluciones reales. Cada proyecto incluye el problema, el diseño, el código y los resultados medibles.</p>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num" id="total-projects">3</div>
+      <div class="stat-label">Proyectos documentados</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num v2">120+</div>
+      <div class="stat-label">Horas/mes ahorradas</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">5</div>
+      <div class="stat-label">Tecnologías usadas</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num v2">3</div>
+      <div class="stat-label">Industrias</div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters">
+    <span class="filter-label">Filtrar:</span>
+    <button class="filter-btn active" onclick="filterCards('all', this)">Todos</button>
+    <button class="filter-btn" onclick="filterCards('rpa', this)">RPA</button>
+    <button class="filter-btn" onclick="filterCards('script', this)">Scripts</button>
+    <button class="filter-btn" onclick="filterCards('etl', this)">ETL / Reportes</button>
+    <button class="filter-btn" onclick="filterCards('integracion', this)">Integraciones</button>
+  </div>
+
+  <!-- PROJECT CARDS -->
+  <div class="grid" id="grid">
+
+    <!-- PROYECTO 1 — ejemplo RPA -->
+    <a class="card rpa" href="#" data-type="rpa">
+      <div class="card-left">
+        <div class="card-meta">
+          <span class="card-type type-rpa">RPA</span>
+          <span class="card-date">Enero 2025</span>
+        </div>
+        <div class="card-title">Automatización de captura de pedidos en SAP desde correo</div>
+        <div class="card-desc">
+          El equipo de logística recibía ~80 pedidos diarios por email y los capturaba a mano en SAP. 
+          Implementé un bot con Power Automate + UiPath que lee, valida e ingresa cada pedido automáticamente.
+        </div>
+        <div class="card-tags">
+          <span class="tag">UiPath</span>
+          <span class="tag">Power Automate</span>
+          <span class="tag">SAP</span>
+          <span class="tag">Logística</span>
+        </div>
+      </div>
+      <div class="card-right">
+        <div class="metric">
+          <div class="metric-val">-87%</div>
+          <div class="metric-label">Tiempo de captura</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val v2">0</div>
+          <div class="metric-label">Errores/mes</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+    </a>
+
+    <!-- PROYECTO 2 — ejemplo ETL -->
+    <a class="card etl" href="#" data-type="etl">
+      <div class="card-left">
+        <div class="card-meta">
+          <span class="card-type type-etl">ETL / Reporte</span>
+          <span class="card-date">Marzo 2025</span>
+        </div>
+        <div class="card-title">Pipeline de consolidación de KPIs de producción en tiempo real</div>
+        <div class="card-desc">
+          Cuatro plantas enviaban sus indicadores en Excel cada semana. 
+          Construí un pipeline Python + SQL Server que centraliza, normaliza y alimenta un dashboard actualizado cada hora.
+        </div>
+        <div class="card-tags">
+          <span class="tag">Python</span>
+          <span class="tag">SQL Server</span>
+          <span class="tag">Power BI</span>
+          <span class="tag">Manufactura</span>
+        </div>
+      </div>
+      <div class="card-right">
+        <div class="metric">
+          <div class="metric-val">3 días</div>
+          <div class="metric-label">→ tiempo real</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val v2">4</div>
+          <div class="metric-label">Plantas integradas</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+    </a>
+
+    <!-- PROYECTO 3 — ejemplo integración -->
+    <a class="card integracion" href="#" data-type="integracion">
+      <div class="card-left">
+        <div class="card-meta">
+          <span class="card-type type-integracion">Integración</span>
+          <span class="card-date">Mayo 2025</span>
+        </div>
+        <div class="card-title">Flujo n8n: sincronización automática CRM → ERP → notificaciones</div>
+        <div class="card-desc">
+          El equipo de ventas cerraba oportunidades en HubSpot pero alguien tenía que crear la orden en el ERP manualmente. 
+          Diseñé un workflow en n8n que sincroniza ambos sistemas y notifica a operaciones vía Slack en segundos.
+        </div>
+        <div class="card-tags">
+          <span class="tag">n8n</span>
+          <span class="tag">HubSpot</span>
+          <span class="tag">REST API</span>
+          <span class="tag">Slack</span>
+        </div>
+      </div>
+      <div class="card-right">
+        <div class="metric">
+          <div class="metric-val">40 hrs</div>
+          <div class="metric-label">Ahorradas/mes</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val v2">&lt; 30s</div>
+          <div class="metric-label">Tiempo de sync</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+    </a>
+
+    <!-- PLACEHOLDER — próximo proyecto -->
+    <div class="card-placeholder">
+      <div class="ph-icon">＋</div>
+      <div class="ph-text">Próximo proyecto en documentación...</div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    Hecho con 🤖 por <strong>[Tu nombre]</strong> · 
+    <a href="https://linkedin.com/in/tu-perfil" target="_blank">LinkedIn</a>
+  </div>
+</footer>
+
+<script>
+  function filterCards(type, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.card[data-type]').forEach(card => {
+      const show = type === 'all' || card.dataset.type === type;
+      card.style.display = show ? 'grid' : 'none';
+    });
+  }
+</script>
+
+</body>
+</html>
